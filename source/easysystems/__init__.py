@@ -23,8 +23,10 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     mail.init_app(app)
 
-    from easysystems.errors.handlers import errors
+    from source.easysystems.errors.handlers import errors
+    from source.easysystems.main.routes import main
 
     app.register_blueprint(errors)
+    app.register_blueprint(main)
 
     return app
