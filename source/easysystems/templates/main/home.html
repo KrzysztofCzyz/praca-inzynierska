@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Witaj na stronie EasySystems</h1>
+
+<h3>INSERT BIG LOGO HIER</h3>
+
+<div>
+    {% if current_user.is_authenticated %}
+
+    {% else %}
+        <a class="btn btn-primary" href="{{ url_for('users.login') }}">Zaloguj</a>
+    {% endif %}
+</div>
+
+{% endblock content %}

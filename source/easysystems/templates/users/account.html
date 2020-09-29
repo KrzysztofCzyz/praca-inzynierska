@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2 class="mb-3">{{ title }}</h2>
+    <h4 class="mb-2">Email: {{ current_user.email }}</h4>
+    <h4 class="mb-4">Funkcja: {{ role_from_id(current_user.role) }}</h4>
+    <a href="{{ url_for('users.change_password') }}" class="btn btn-primary">Zmiana hasła</a>
+{% endblock content %}

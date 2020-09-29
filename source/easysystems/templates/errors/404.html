@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "layout.html" %}
+{% block content %}
 
-</body>
-</html>
+<h1>Zasób, do którego starasz się dostać nie istnieje.</h1>
+
+<a class="btn btn-primary" href="{{ url_for('main.home') }}">Powrót</a>
+
+{% endblock content %}
