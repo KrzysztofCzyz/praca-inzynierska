@@ -25,8 +25,14 @@ def create_app(config_class=Config):
 
     from source.easysystems.errors.handlers import errors
     from source.easysystems.main.routes import main
+    from source.easysystems.users.routes import users
+    from source.easysystems.users.utils import role_from_id, is_admin
 
     app.register_blueprint(errors)
     app.register_blueprint(main)
+    app.register_blueprint(users)
+
+    app.jinja_env.globals.update(role_from_id=role_from_id)
+    app.jinja_env.globals.update(is_admin=is_admin)
 
     return app

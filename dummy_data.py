@@ -1,6 +1,6 @@
 from source.easysystems.orders.models import *
 from source.easysystems.users.models import *
-from source.easysystems import db, create_app
+from source.easysystems import db, create_app, bcrypt
 
 app = create_app()
 app.app_context().push()
@@ -111,8 +111,10 @@ print(test)
 
 # testowanie modelu User
 
-u1 = User(email="janusz@blabla.pl", password="jan123", role=1)
-u2 = User(email="barry@blabla.pl", password="jan123", role=2)
+password = bcrypt.generate_password_hash('admin123').decode('utf-8')
+
+u1 = User(email="janusz@blabla.pl", password=password, role=1)
+u2 = User(email="jxxfag@fag.com", password=password, role=2)
 
 db.session.add(u1)
 db.session.add(u2)
