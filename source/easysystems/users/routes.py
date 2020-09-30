@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, url_for, flash, render_template, request, abort
-from flask_login import current_user, login_user, logout_user, login_required, fresh_login_required
+from flask_login import current_user, login_user, logout_user, login_required
 
 from source.easysystems import bcrypt, db
 from source.easysystems.users.models import User
@@ -97,7 +97,7 @@ def reset_token(token):
 
 
 @users.route("/change-password", methods=['GET', 'POST'])
-@fresh_login_required
+@login_required
 def change_password():
     form = ResetPasswordForm()
     if form.validate_on_submit():
@@ -125,13 +125,13 @@ def update_account(id_):
         flash('Konto zostało zaktualizowane!', 'success')
         return redirect(url_for('users.manage_accounts'))
     elif request.method == 'GET':
-        form.role.choices = get_roles()
         form.email.data = user.email
-    return render_template('users/update-account.html', title='Account', form=form)
+    form.role.choices = get_roles()
+    return render_template('users/update-account.html', title='Aktualizuj konto', form=form)
 
 
 @users.route("/delete-account/<int:id_>", methods=['GET'])
-@fresh_login_required
+@login_required
 def delete_account(id_):
     if not is_admin(current_user):
         abort(403)
