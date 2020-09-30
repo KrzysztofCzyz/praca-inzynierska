@@ -29,7 +29,7 @@ def get_roles():
 
 def send_reset_message(user):
     token = user.get_reset_token()
-    message = Message('Żądanie resetu hasła',
+    message = Message('Żądanie zresetowania hasła',
                   sender='noreply@easysystems.pl',
                   recipients=[user.email], )
     message.body = f'''Aby zmienić hasło, kliknij poniższy link:

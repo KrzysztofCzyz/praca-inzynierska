@@ -6,120 +6,203 @@ app = create_app()
 app.app_context().push()
 db.create_all()
 
-# testowanie modelu Order
 
-order1 = Order(name="Szycie sukienek")
-order2 = Order(name="Szycie sukienek 2")
-
-db.session.add(order1)
-db.session.add(order2)
-db.session.commit()
+def module_install_users():
+    add_roles()
+    add_users()
 
 
-test1 = Order.query.all()
-test2 = test1[0].name
-test3 = test1[1].id
+def module_install_orders():
+    add_colors()
+    add_sizes()
+    add_components()
+    add_ordered_components_and_product()
+    add_order_items_and_orders()
 
-print(test1)
-print(test2)
-print(test3)
 
-# testowanie modelu Color
+def module_test_users():
+    roles_test()
+    users_test()
 
-color1 = Color(name="Niebieski")
-color2 = Color(name="Czerwony")
-color3 = Color(name="Zielony")
-color4 = Color(name="Czarny")
 
-db.session.add(color1)
-db.session.add(color2)
-db.session.add(color3)
-db.session.add(color4)
-db.session.commit()
+def module_test_orders():
+    colors_test()
+    sizes_test()
+    components_test()
+    ordered_components_and_product_test()
+    order_items_and_orders_test()
 
-test1 = Color.query.all()
-test2 = test1[0].name
-test3 = test1[1].id
 
-print(test1)
-print(test2)
-print(test3)
+def add_roles():
+    r1 = Role(name="Admin")
+    r2 = Role(name="Maszyna CNC")
+    r3 = Role(name="Szycie")
+    r4 = Role(name="Kontrola Jakości")
+    r5 = Role(name="Pakowanie")
 
-# testowanie modelu Size
+    db.session.add(r1)
+    db.session.add(r2)
+    db.session.add(r3)
+    db.session.add(r4)
+    db.session.add(r5)
 
-item1 = Size(name="XS")
-item2 = Size(name="S")
-item3 = Size(name="M")
-item4 = Size(name="L")
-item5 = Size(name="XL")
-item6 = Size(name="XXL")
+    db.session.commit()
 
-db.session.add(item1)
-db.session.add(item2)
-db.session.add(item3)
-db.session.add(item4)
-db.session.add(item5)
-db.session.add(item6)
-db.session.commit()
 
-test1 = Size.query.all()
-test2 = test1[2].name
-test3 = test1[3].id
+def add_users():
+    password = bcrypt.generate_password_hash('admin123').decode('utf-8')
 
-print(test1)
-print(test2)
-print(test3)
+    u1 = User(email="admin@easysystems.pl", password=password, role=1)
 
-# testowanie modelu Item
+    db.session.add(u1)
+    db.session.commit()
 
-xitem1 = Item(name="Sukienka", quantity=100, size=1, color=2, parent=1)
-xitem2 = Item(name="Sukienka", quantity=20, size=2, color=3, parent=1)
-xitem3 = Item(name="Sukienka", quantity=200, size=3, color=1, parent=1)
-xitem4 = Item(name="Sukienka", quantity=3, size=4, color=4, parent=2)
-xitem5 = Item(name="Sukienka", quantity=34, size=3, color=3, parent=1)
-xitem6 = Item(name="Sukienka", quantity=24, size=2, color=1, parent=2)
 
-db.session.add(xitem1)
-db.session.add(xitem2)
-db.session.add(xitem3)
-db.session.add(xitem4)
-db.session.add(xitem5)
-db.session.add(xitem6)
-db.session.commit()
+def users_test():
+    print(User.query.all())
 
-test1 = Item.query.all()
-test2 = test1[2].name
-test3 = test1[3].id
-test4 = test1[4].parent
 
-print(test1)
-print(test2)
-print(test3)
-print(test4)
+def roles_test():
+    print(Role.query.all())
 
-# testowanie modelu Role
 
-r1 = Role(name="User")
-r2 = Role(name="Admin")
+def add_sizes():
+    item1 = Size(name="XS", fabric_multiplier=0.9)
+    item2 = Size(name="S", fabric_multiplier=1.0)
+    item3 = Size(name="M", fabric_multiplier=1.1)
+    item4 = Size(name="L", fabric_multiplier=1.2)
+    item5 = Size(name="XL", fabric_multiplier=1.3)
+    item6 = Size(name="XXL", fabric_multiplier=1.4)
 
-db.session.add(r1)
-db.session.add(r2)
-db.session.commit()
+    db.session.add(item1)
+    db.session.add(item2)
+    db.session.add(item3)
+    db.session.add(item4)
+    db.session.add(item5)
+    db.session.add(item6)
+    db.session.commit()
 
-test = Role.query.all()
-print(test)
 
-# testowanie modelu User
+def add_colors():
+    color1 = Color(name="Niebieski")
+    color2 = Color(name="Czerwony")
+    color3 = Color(name="Zielony")
+    color4 = Color(name="Czarny")
 
-password = bcrypt.generate_password_hash('admin123').decode('utf-8')
+    db.session.add(color1)
+    db.session.add(color2)
+    db.session.add(color3)
+    db.session.add(color4)
+    db.session.commit()
 
-u1 = User(email="janusz@blabla.pl", password=password, role=1)
-u2 = User(email="jxxfag@fag.com", password=password, role=2)
 
-db.session.add(u1)
-db.session.add(u2)
-db.session.commit()
+def sizes_test():
+    print(Size.query.all())
 
-test = User.query.all()
-print(test)
-print(order1.items)
+
+def colors_test():
+    print(Color.query.all())
+
+
+def add_components():
+    c1 = Component(name="Guzik", quantity=10, color=1)
+    c2 = Component(name="Guzik", quantity=10, color=2)
+    c3 = Component(name="Guzik", quantity=10, color=3)
+    c4 = Component(name="Guzik", quantity=10, color=4)
+
+    cc1 = Component(name="Materiał", quantity=10, color=1)
+    cc2 = Component(name="Materiał", quantity=10, color=2)
+    cc3 = Component(name="Materiał", quantity=10, color=3)
+    cc4 = Component(name="Materiał", quantity=10, color=4)
+
+    ccc1 = Component(name="Nić", quantity=10, color=1)
+    ccc2 = Component(name="Nić", quantity=10, color=2)
+    ccc3 = Component(name="Nić", quantity=10, color=3)
+    ccc4 = Component(name="Nić", quantity=10, color=4)
+
+    cccc1 = Component(name="Zasuwak", quantity=10, color=1)
+    cccc2 = Component(name="Zasuwak", quantity=10, color=2)
+    cccc3 = Component(name="Zasuwak", quantity=10, color=3)
+    cccc4 = Component(name="Zasuwak", quantity=10, color=4)
+
+    db.session.add(c1)
+    db.session.add(c2)
+    db.session.add(c3)
+    db.session.add(c4)
+
+    db.session.add(cc1)
+    db.session.add(cc2)
+    db.session.add(cc3)
+    db.session.add(cc4)
+
+    db.session.add(ccc1)
+    db.session.add(ccc2)
+    db.session.add(ccc3)
+    db.session.add(ccc4)
+
+    db.session.add(cccc1)
+    db.session.add(cccc2)
+    db.session.add(cccc3)
+    db.session.add(cccc4)
+
+    db.session.commit()
+
+
+def components_test():
+    print(Component.query.all())
+
+
+def add_ordered_components_and_product():
+    product = Product(name="Bluza")
+    product2 = Product(name="Sukienka")
+
+    p1 = OrderedComponent(component=1, quantity=4, product=product)
+    p2 = OrderedComponent(component=6, quantity=3, product=product)
+    p3 = OrderedComponent(component=9, quantity=1, product=product)
+    p4 = OrderedComponent(component=13, quantity=1, product=product)
+
+    p5 = OrderedComponent(component=3, quantity=2, product=product)
+    p6 = OrderedComponent(component=8, quantity=4, product=product)
+    p7 = OrderedComponent(component=11, quantity=2, product=product)
+    p8 = OrderedComponent(component=15, quantity=1, product=product)
+
+    db.session.add(p1)
+    db.session.add(p2)
+    db.session.add(p3)
+    db.session.add(p4)
+    db.session.add(product)
+
+    db.session.add(p5)
+    db.session.add(p6)
+    db.session.add(p7)
+    db.session.add(p8)
+    db.session.add(product2)
+
+    db.session.commit()
+
+
+def ordered_components_and_product_test():
+    print(OrderedComponent.query.all())
+    print(Product.query.all())
+
+
+def order_items_and_orders_test():
+    print(OrderItem.query.all())
+    print(Order.query.all())
+
+
+def add_order_items_and_orders():
+    order = Order(name="Szycie bluzy XS i sukienki XXL")
+
+    i1 = OrderItem(quantity=1, product=1, size=1, order=order)
+    i2 = OrderItem(quantity=1, product=1, size=6, order=order)
+
+    db.session.add(i1)
+    db.session.add(i2)
+    db.session.add(order)
+
+
+module_install_users()
+module_test_users()
+module_install_orders()
+module_test_orders()
