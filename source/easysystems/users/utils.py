@@ -1,5 +1,3 @@
-import os
-import secrets
 from mailbox import Message
 from source.easysystems.users.models import Role
 from source.easysystems import mail
