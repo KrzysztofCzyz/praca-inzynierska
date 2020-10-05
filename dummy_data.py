@@ -161,10 +161,10 @@ def add_ordered_components_and_product():
     p3 = OrderedComponent(component=9, quantity=1, product=product)
     p4 = OrderedComponent(component=13, quantity=1, product=product)
 
-    p5 = OrderedComponent(component=3, quantity=2, product=product)
-    p6 = OrderedComponent(component=8, quantity=4, product=product)
-    p7 = OrderedComponent(component=11, quantity=2, product=product)
-    p8 = OrderedComponent(component=15, quantity=1, product=product)
+    p5 = OrderedComponent(component=3, quantity=2, product=product2)
+    p6 = OrderedComponent(component=8, quantity=4, product=product2)
+    p7 = OrderedComponent(component=11, quantity=2, product=product2)
+    p8 = OrderedComponent(component=15, quantity=1, product=product2)
 
     db.session.add(p1)
     db.session.add(p2)

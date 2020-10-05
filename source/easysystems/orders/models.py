@@ -53,7 +53,7 @@ class OrderedComponent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)
     component = db.Column(db.ForeignKey('component.id'), nullable=False)
-    prduct_fk = db.Column(db.ForeignKey('product.id'), nullable=False)
+    product_fk = db.Column(db.ForeignKey('product.id'), nullable=False)
     product = db.relationship('Product', backref=db.backref('components', lazy=True), lazy=True)
 
     def __repr__(self):

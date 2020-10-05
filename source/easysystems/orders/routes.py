@@ -46,29 +46,58 @@ def deny_order(id_):
     pass
 
 
-@orders.route("/product/add", methods=['GET', 'POST'])
-@login_required
-def add_product():
-    result = get_orders_for_user(current_user)
-    return render_template('orders/view-orders.html', title='Zlecenia', orders=result)
-
-
-@orders.route("/product/remove/<int:id_>", methods=['GET', 'POST'])
+@orders.route("/products/remove/<int:id_>", methods=['GET'])
 @login_required
 def remove_product(id_):
-    result = get_orders_for_user(current_user)
-    return render_template('orders/view-orders.html', title='Zlecenia', orders=result)
+    if not is_admin(current_user):
+        abort(403)
+    result = Product.query.filter_by(id=id_).first_or_404()
+    for component in result.components:
+        db.session.delete(component)
+    db.session.delete(result)
+    db.session.commit()
+    flash('Pomyślnie usunięto produkt ' + result.name, 'success')
+    return redirect(url_for('orders.list_products'))
 
 
-# @orders.route("/product/list", methods=['GET', 'POST'])
-# @login_required
-# def list_products():
-#     result = get_orders_for_user(current_user)
-#     return render_template('orders/view-orders.html', title='Zlecenia', orders=result)
-#
-#
+@orders.route("/products/list", methods=['GET'])
+@login_required
+def list_products():
+    result = get_products()
+    return render_template('orders/view-products.html', title='Produkty', products=result)
 
-@orders.route("/components/", methods=['GET', 'POST'])
+
+@orders.route("/products/add", methods=['GET', 'POST'])
+@login_required
+def add_product():
+    if not is_admin(current_user):
+        abort(403)
+    form = AddProductForm()
+    result = get_components()
+    labels = []
+    for e in result:
+        labels.append(f"{e.name}: {color_from_id(e.color)}")
+    if form.validate_on_submit():
+        product = Product(name=form.name.data)
+        for field in form.components.entries:
+            if field.data > 0:
+                item_id = int(field.label.text.split('-')[1]) + 1
+                component = OrderedComponent(quantity=field.data, component=item_id, product=product)
+                db.session.add(component)
+        if len(product.components) > 0:
+            db.session.add(product)
+            db.session.commit()
+            flash('Produkt dodany pomyślnie', 'success')
+            return redirect(url_for('orders.list_products'))
+        else:
+            flash('Nie dodano żadnego komponentu. Produkt nie zostanie dodany', 'danger')
+    elif request.method == 'GET':
+        for e in result:
+            form.components.append_entry(data=0)
+    return render_template('orders/add-product.html', title='Dodaj produkt', form=form, labels=labels)
+
+
+@orders.route("/components/list", methods=['GET'])
 @login_required
 def list_components():
     result = get_components()
@@ -89,12 +118,11 @@ def add_components():
         result = get_components()
         for field in form.components.entries:
             item_id = int(field.label.text.split('-')[1])+1
-            print(item_id)
-            print(field.data)
             for r in result:
                 if r.id == item_id:
                     r.quantity += field.data
         db.session.commit()
+        flash('Komponenty dodane pomyślnie', 'success')
         return redirect(url_for('orders.list_components'))
     elif request.method == 'GET':
         for e in result:
