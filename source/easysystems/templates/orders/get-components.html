@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<main>
+    <form method="post" action="">
+        {{ form.hidden_tag() }}
+        <h2 class="mb-4">{{ title }}</h2>
+        {% for item in form.components.entries %}
+            <div class="form-group mb-4">
+            {{ labels[loop.index-1] }}
+            {% if item.errors %}
+                {{ item(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in item.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+            {% else %}
+                {{ item(class="form-control form-control-md") }}
+            {% endif %}
+            </div>
+        {% endfor %}
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+</main>
+{% endblock content %}

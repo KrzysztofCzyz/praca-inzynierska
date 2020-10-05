@@ -28,6 +28,7 @@ def create_app(config_class=Config):
     from source.easysystems.users.routes import users
     from source.easysystems.orders.routes import orders
     from source.easysystems.users.utils import role_from_id, is_admin
+    from source.easysystems.orders.utils import color_from_id
 
     app.register_blueprint(errors)
     app.register_blueprint(main)
@@ -36,5 +37,6 @@ def create_app(config_class=Config):
 
     app.jinja_env.globals.update(role_from_id=role_from_id)
     app.jinja_env.globals.update(is_admin=is_admin)
+    app.jinja_env.globals.update(color_from_id=color_from_id)
 
     return app
