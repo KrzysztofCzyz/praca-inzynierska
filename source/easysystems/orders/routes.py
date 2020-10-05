@@ -13,51 +13,88 @@ orders = Blueprint('orders', __name__)
 @login_required
 def list_orders():
     result = get_orders_for_user(current_user)
-    return render_template('orders/view-orders.html', title='Zlecenia', orders=result)
+    return render_template('orders/view-orders.html', title='Zamówienia', orders=result)
 
 
 @orders.route("/add", methods=['GET', 'POST'])
 @login_required
 def add_order():
-    return render_template('orders/add-order.html', title='Dodaj zamówienie')
+    form = AddOrderForm()
+    if form.validate_on_submit():
+        order = Order(name=form.name.data)
+        db.session.add(order)
+        db.session.commit()
+        flash('Pomyślnie dodano zamówienie', 'success')
+        return redirect(url_for('orders.add_order_item', id_=order.id))
+    return render_template('orders/add-order.html', title='Dodaj zamówienie', form=form)
 
 
-@orders.route("/remove/<int:id_>", methods=['GET', 'POST'])
+@orders.route("/add/<int:id_>", methods=['GET', 'POST'])
+@login_required
+def add_order_item(id_):
+    if not is_admin(current_user):
+        abort(403)
+    order = Order.query.filter_by(id=id_).first_or_404()
+    if order.position != 1:
+        abort(404)
+    if order.items:
+        order_products = list(map(lambda item: item.product, order.items))
+    else:
+        order_products = list()
+    form = AddOrderItemForm()
+    products = get_products()
+    result = list(map(lambda product: (product.id, product.name), products))
+    form.product.choices = result
+    sizes = get_sizes()
+    result = list(map(lambda size: (size.id, size.name), sizes))
+    form.size.choices = result
+    if form.validate_on_submit():
+        if form.product.data in order_products:
+            flash('Ten produkt istnieje już w Twoim zamówieniu!', 'danger')
+        else:
+            print(form.quantity.data, form.product.data, form.size.data, id_, form.size.data)
+            order_item = OrderItem(quantity=form.quantity.data, product=form.product.data,
+                                   order_fk=id_, size=form.size.data)
+            db.session.add(order_item)
+            db.session.commit()
+            flash('Pomyślnie dodano nową pozycję w zamówieniu', 'success')
+            return redirect(url_for('orders.view_order', id_=id_))
+    return render_template('orders/add-order-item.html', title='Dodaj pozycję do zamówienia', form=form)
+
+
+@orders.route("/remove/<int:id_>", methods=['GET'])
 @login_required
 def remove_order(id_):
+    if not is_admin(current_user):
+        abort(403)
+    order = Order.query.filter_by(id=id_).first_or_404()
+    if order.position != 1:
+        abort(404)
+    for item in order.items:
+        db.session.delete(item)
+    db.session.delete(order)
+    db.session.commit()
+    flash('Pomyślnie usunięto to zamówienie', 'success')
     return render_template('orders/remove-order.html', title='Usuń zamówienie')
 
 
-@orders.route("/order/<int:id_>", methods=['GET', 'POST'])
+@orders.route("/order/<int:id_>", methods=['GET'])
 @login_required
 def view_order(id_):
-    return render_template('orders/view-order.html', title='Usuń zamówienie')
+    order = Order.query.filter_by(id=id_).first_or_404()
+    form = MessageForm()
+    if form.validate_on_submit():
+        if form.accept.checked:
+            advance_order(order)
+        else:
+            deny_order(order, form.message.data)
+    return render_template('orders/view-order.html', title='Szczegóły zamówienia', order=order, form=form)
 
 
-@orders.route("/accept/<int:id_>", methods=['GET'])
+@orders.route("/launch/<int:id_>", methods=['GET'])
 @login_required
-def accept_order(id_):
+def launch_order(id_):
     pass
-
-
-@orders.route("/deny/<int:id_>", methods=['GET'])
-@login_required
-def deny_order(id_):
-    pass
-
-
-@orders.route("/products/remove/<int:id_>", methods=['GET'])
-@login_required
-def remove_product(id_):
-    if not is_admin(current_user):
-        abort(403)
-    result = Product.query.filter_by(id=id_).first_or_404()
-    for component in result.components:
-        db.session.delete(component)
-    db.session.delete(result)
-    db.session.commit()
-    flash('Pomyślnie usunięto produkt ' + result.name, 'success')
-    return redirect(url_for('orders.list_products'))
 
 
 @orders.route("/products/list", methods=['GET'])
@@ -95,6 +132,20 @@ def add_product():
         for e in result:
             form.components.append_entry(data=0)
     return render_template('orders/add-product.html', title='Dodaj produkt', form=form, labels=labels)
+
+
+@orders.route("/products/remove/<int:id_>", methods=['GET'])
+@login_required
+def remove_product(id_):
+    if not is_admin(current_user):
+        abort(403)
+    result = Product.query.filter_by(id=id_).first_or_404()
+    for component in result.components:
+        db.session.delete(component)
+    db.session.delete(result)
+    db.session.commit()
+    flash('Pomyślnie usunięto produkt ' + result.name, 'success')
+    return redirect(url_for('orders.list_products'))
 
 
 @orders.route("/components/list", methods=['GET'])

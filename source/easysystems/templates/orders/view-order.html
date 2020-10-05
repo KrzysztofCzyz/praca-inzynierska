@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+<main>
+    <h2 class="mb-3">{{ order.name }}</h2>
+    <h4 class="mb-3">Obecna pozycja: {{ role_from_id(order.position) }}</h4>
+    <h4>Zamówienia:</h4>
+    <ul class="list-group">
+        {% for item in order.items %}
+            <li class="list-group-item">Przedmiot: "{{ get_product_by_id(item.product).name }}", rozmiar: {{ get_size_by_id(item.size).name }}, ilość: {{ item.quantity }}</li>
+        {% endfor %}
+    </ul>
+    {% if current_user.role == order.position %}
+    <h2 class="mb-3">Czy zatwierdzasz to zamówienie?</h2>
+    <form class="form-inline">
+        {{ form.hidden_tag() }}
+        <div class="form-group mr-3">
+            {{ form.accept.label(class="form-control-label mr-1") }}
+            {% if form.accept.errors %}
+                {{ form.accept(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.accept.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+            {% else %}
+                {{ form.accept(class="form-control form-control-md mr-1") }}
+            {% endif %}
+        </div>
+        <div class="form-group mr-3">
+            {{ form.message.label(class="form-control-label mr-1") }}
+            {% if form.message.errors %}
+                {{ form.message(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.message.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+            {% else %}
+                {{ form.message(class="form-control form-control-md mr-1") }}
+            {% endif %}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+    {% endif %}
+</main>
+{% endblock content %}

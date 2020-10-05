@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<form method="post" action="">
+    {{ form.hidden_tag() }}
+    <h2 class="mb-3">{{ title }}</h2>
+    <div class="form-group mb-3">
+        {{ form.name.label(class="form-control-label") }}
+        {% if form.name.errors %}
+            {{ form.name(class="form-control form-control-md is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.name.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+        {% else %}
+            {{ form.name(class="form-control form-control-md") }}
+        {% endif %}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock content %}

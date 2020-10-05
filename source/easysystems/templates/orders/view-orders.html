@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>{{ title }}</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Nazwa</th>
+            <th scope="col">Akcja</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+        <tr>
+            <th scope="row">{{ order.name }}</th>
+            {% if is_admin(current_user) %}
+                <td><a class="btn btn-info" href="{{ url_for('orders.launch_order', id_=order.id) }}">Szczegóły</a></td>
+            {% else %}
+                <td><a class="btn btn-info" href="{{ url_for('orders.view_order', id_=order.id) }}">Szczegóły</a></td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

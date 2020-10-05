@@ -13,6 +13,19 @@ def get_product_by_id(id_):
         abort(500)
 
 
+def get_size_by_id(id_):
+    result = Size.query.filter_by(id=id_).first()
+    if result:
+        return result
+    else:
+        abort(500)
+
+
+def get_sizes():
+    result = Size.query.all()
+    return result
+
+
 def get_products():
     result = Product.query.all()
     return result
@@ -44,14 +57,12 @@ def get_component_by_id(id_):
         abort(500)
 
 
-def advance_order(order, message):
+def advance_order(order):
     if role_from_id(order.position) == 'Pakowanie':
-        order.message = message
         order.completed = True
         db.session.commit()
         return
     order.position += 1
-    order.message = message
     db.session.commit()
 
 
