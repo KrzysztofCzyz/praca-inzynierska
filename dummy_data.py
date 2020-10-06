@@ -195,11 +195,12 @@ def add_order_items_and_orders():
     order = Order(name="Szycie bluzy XS i sukienki XXL")
 
     i1 = OrderItem(quantity=1, product=1, size=1, order=order)
-    i2 = OrderItem(quantity=1, product=1, size=6, order=order)
+    i2 = OrderItem(quantity=1, product=2, size=6, order=order)
 
     db.session.add(i1)
     db.session.add(i2)
     db.session.add(order)
+    db.session.commit()
 
 
 module_install_users()

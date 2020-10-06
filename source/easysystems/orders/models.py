@@ -5,6 +5,7 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
+    requires_action = db.Column(db.Boolean, nullable=False, default=False)
     position = db.Column(db.ForeignKey('role.id'), nullable=False, default=1)  # zakłada role admina
     message = db.Column(db.String(120), nullable=True)
 

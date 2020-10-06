@@ -15,8 +15,11 @@
     {% for order in orders %}
         <tr>
             <th scope="row">{{ order.name }}</th>
-            {% if is_admin(current_user) %}
-                <td><a class="btn btn-info" href="{{ url_for('orders.launch_order', id_=order.id) }}">Szczegóły</a></td>
+            {% if is_admin(current_user) and order.requires_action %}
+                <td><a class="btn btn-info" href="{{ url_for('orders.perform_action', id_=order.id) }}">Przywróć</a></td>
+            {% endif %}
+            {% if is_admin(current_user) and order.position == 1 %}
+                <td><a class="btn btn-info" href="{{ url_for('orders.launch_order', id_=order.id) }}">Uruchom</a></td>
             {% else %}
                 <td><a class="btn btn-info" href="{{ url_for('orders.view_order', id_=order.id) }}">Szczegóły</a></td>
             {% endif %}

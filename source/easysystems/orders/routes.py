@@ -96,7 +96,20 @@ def remove_order(id_):
     return render_template('orders/remove-order.html', title='Usuń zamówienie')
 
 
-@orders.route("/order/<int:id_>", methods=['GET'])
+@orders.route("/order/poke/<int:id_>", methods=['GET'])
+@login_required
+def perform_action(id_):
+    if not is_admin(current_user):
+        abort(403)
+    order = Order.query.filter_by(id=id_).first_or_404()
+    if order.requires_action is True:
+        order.message = ""
+        order.requires_action = False
+        db.session.commit()
+    return redirect(url_for('orders.list_orders'))
+
+
+@orders.route("/order/<int:id_>", methods=['GET', 'POST'])
 @login_required
 def view_order(id_):
     order = Order.query.filter_by(id=id_).first_or_404()
@@ -150,6 +163,7 @@ def launch_order(id_):
         order.position += 1
         db.session.commit()
         flash('Pomyślnie uruchomiono zamówienie ' + order.name, 'success')
+        return redirect(url_for('orders.view_order', id_=order.id))
     return render_template('orders/launch-order.html', title='Uruchom zamówienie', order=order, form=form,
                            item_list=final_list)
 
@@ -201,7 +215,7 @@ def remove_product(id_):
         db.session.delete(component)
     db.session.delete(result)
     db.session.commit()
-    flash('Pomyślnie usunięto produkt ' + result.name, 'success')
+    flash('Pomyślnie usunięto produkt: ' + result.name, 'success')
     return redirect(url_for('orders.list_products'))
 
 
