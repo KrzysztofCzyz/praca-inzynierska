@@ -4,6 +4,7 @@
     {% if is_admin(current_user) %}
         <a href="{{ url_for('orders.add_product') }}" class="btn btn-primary mb-3">Dodaj produkt</a>
     {% endif %}
+    <h2 class="mb-3">{{ title }}</h2>
     {% for item in products %}
         <div class="card mb-4">
             <div class="card-body">

@@ -36,6 +36,8 @@
                 </div>
                 {{ form.submit(class="btn btn-primary") }}
             </form>
+        <br>
+        <a class="btn btn-outline-info" href="{{ url_for('users.reset_request') }}">Zapomniałeś hasła?</a>
     </main>
 {% endblock content %}
 

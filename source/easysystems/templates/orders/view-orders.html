@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 {% if is_admin(current_user) %}
-    <a class="btn btn-primary mb-4" href="{{url_for('orders.add_order')}}">Dodaj zamówienie</a>
+    <a class="btn btn-primary mb-3" href="{{url_for('orders.add_order')}}">Dodaj zamówienie</a>
 {% endif %}
-<h2>{{ title }}</h2>
+<h2 class="mb-3">{{ title }}</h2>
 <table class="table">
     <thead>
         <tr>

@@ -93,7 +93,7 @@ def remove_order(id_):
     db.session.delete(order)
     db.session.commit()
     flash('Pomyślnie usunięto to zamówienie', 'success')
-    return render_template('orders/remove-order.html', title='Usuń zamówienie')
+    return redirect(url_for('orders.list_orders'))
 
 
 @orders.route("/order/poke/<int:id_>", methods=['GET'])
@@ -214,6 +214,10 @@ def remove_product(id_):
     if not is_admin(current_user):
         abort(403)
     result = Product.query.filter_by(id=id_).first_or_404()
+    o = OrderItem.query.filter_by(product=result.id).first()
+    if o:
+        flash('Produkt znajduje się w użyciu. Nie można go usunąć!', 'info')
+        return redirect(url_for('orders.list_products'))
     for component in result.components:
         db.session.delete(component)
     db.session.delete(result)
