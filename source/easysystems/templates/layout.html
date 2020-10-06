@@ -1,42 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pl">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!--    Bootstrap files-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-    <!--    Title-->
     {% if title %}
-    <title>EasySystems - {{ title }}</title>
+        <title>EasySystems - {{ title }}</title>
     {% else %}
-    <title>EasySystems</title>
+        <title>EasySystems</title>
     {% endif %}
-
 </head>
 <body>
 <div class="container">
     <header class="row">
-            <div class="col-md-1 text-center">
-                <h2>Lmao@automation</h2>
-            </div>
-            <div class="col"></div>
-            <div class="col-md-1 text-center">
-                <h2>Login</h2>
-            </div>
+        <div class="col-md-1 text-center">
+            <h2>EasySystems</h2>
+        </div>
+        <div class="col"></div>
+        <div class="col-md-3 text-center">
+            {% if current_user.is_authenticated %}
+                <h2><a href="{{ url_for('users.account') }}">{{ current_user.email }}</a></h2>
+            {% else %}
+                <h2><a href="{{ url_for('users.login') }}">Login</a></h2>
+            {% endif %}
+        </div>
     </header>
 
     <nav class="nav row">
-        <a class="nav-link active" href="#">Home</a>
-        <a class="nav-link disabled" href="#">Konto</a>
-        <a class="nav-link disabled" href="#">Managment</a>
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Zlecenia</a>
+        <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
+        {% if current_user.is_authenticated %}
+            <a class="nav-link" href="{{ url_for('orders.list_orders') }}">Zamówienia</a>
+            {% if is_admin(current_user) %}
+                <a class="nav-link" href="{{ url_for('users.manage_accounts') }}">Managment</a>
+                <a class="nav-link" href="{{ url_for('orders.list_products') }}">Produkty</a>
+                <a class="nav-link" href="{{ url_for('orders.list_components') }}">Komponenty</a>
+            {% endif %}
+        {% endif %}
     </nav>
 
     <hr>
+
     <div class="row justify-content-center text-center">
         <div class="col-md-8">
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -48,25 +51,21 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-
             {% block content %}{% endblock %}
         </div>
     </div>
-
 
     <hr>
 
     <footer class="container text-muted text-center">
         <div class="row">
-            <h6 class="col-md-2">Lmao@automation&#8482;</h6>
+            <h6 class="col-md-2">EasySystems&#8482;</h6>
             <div class="col-md-8"></div>
             <h6 class="col-md-2">Made by: Krzysztof Czyż</h6>
         </div>
     </footer>
 </div>
 
-
-    <!--Bootstrap JS-->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

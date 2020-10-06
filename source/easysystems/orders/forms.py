@@ -42,11 +42,10 @@ class AddOrderItemForm(FlaskForm):
 
 
 class MessageForm(FlaskForm):
-    message = StringField('Wiadomość', validators=[DataRequired()])
-    accept = BooleanField('Akceptuj?')
+    message = StringField('Wiadomość', default='Wpisz wiadomość')
+    accept = BooleanField('Akceptuj?', default=True)
     submit = SubmitField('Gotowe')
 
 
 class LaunchForm(FlaskForm):
-
     submit = SubmitField('Uruchom zamówienie')

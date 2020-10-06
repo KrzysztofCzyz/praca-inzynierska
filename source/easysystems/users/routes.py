@@ -114,9 +114,7 @@ def change_password():
 def update_account(id_):
     if not is_admin(current_user):
         abort(403)
-    user = User.query.filter_by(id=id_).first()
-    if not user:
-        abort(404)
+    user = User.query.filter_by(id=id_).first_or_404()
     form = UpdateAccountForm()
     if form.validate_on_submit():
         user.email = form.email.data

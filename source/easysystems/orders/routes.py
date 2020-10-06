@@ -115,10 +115,13 @@ def view_order(id_):
     order = Order.query.filter_by(id=id_).first_or_404()
     form = MessageForm()
     if form.validate_on_submit():
-        if form.accept.checked:
+        if form.accept.data:
             advance_order(order)
+            flash('Zamówienie ' + order.name + ' zostało zaakceptowane!', 'success')
         else:
             deny_order(order, form.message.data)
+            flash('Zamówienie ' + order.name + ' zostało odrzucone!', 'info')
+        return redirect(url_for('orders.list_orders'))
     return render_template('orders/view-order.html', title='Szczegóły zamówienia', order=order, form=form)
 
 
@@ -154,8 +157,8 @@ def launch_order(id_):
     for k in temp_dic.keys():
         final_list.append((k, temp_dic.get(k)))
 
-    final_list = map(lambda x: (get_component_by_id(x[0]), round(get_component_by_id(x[0]).quantity-x[1], 1)),
-                     final_list)
+    final_list = list(map(lambda x: (get_component_by_id(x[0]), round(get_component_by_id(x[0]).quantity-x[1], 1)),
+                     final_list))
 
     if form.validate_on_submit():
         for i in final_list:

@@ -192,7 +192,7 @@ def order_items_and_orders_test():
 
 
 def add_order_items_and_orders():
-    order = Order(name="Szycie bluzy XS i sukienki XXL")
+    order = Order(name="Testowe zamówienie")
 
     i1 = OrderItem(quantity=1, product=1, size=1, order=order)
     i2 = OrderItem(quantity=1, product=2, size=6, order=order)

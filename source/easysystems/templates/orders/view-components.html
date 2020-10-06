@@ -1,5 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
+{% if is_admin(current_user) %}
+  <a href="{{ url_for('orders.add_components') }}" class="btn btn-primary mb-3">Dodaj komponenty</a>
+{% endif %}
 <table class="table">
   <thead>
     <tr>

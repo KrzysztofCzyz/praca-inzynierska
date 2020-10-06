@@ -14,7 +14,9 @@
         <tr>
         <th scope="row">{{ user.email }}</th>
         <td>{{ role_from_id(user.role) }}</td>
-        <td><a class="btn btn-secondary mr-2" href="{{ url_for('users.update_account', id_=user.id) }}">Edytuj</a><a class="btn btn-danger" href="{{ url_for('users.delete_account', id_=user.id) }}">Usuń</a></td>
+        <td>
+            <a class="btn btn-secondary mr-2" href="{{ url_for('users.update_account', id_=user.id) }}">Edytuj</a>
+            <a class="btn btn-danger" href="{{ url_for('users.delete_account', id_=user.id) }}">Usuń</a></td>
         </tr>
     {% endfor %}
     </tbody>

@@ -4,4 +4,5 @@
     <h4 class="mb-2">Email: {{ current_user.email }}</h4>
     <h4 class="mb-4">Funkcja: {{ role_from_id(current_user.role) }}</h4>
     <a href="{{ url_for('users.change_password') }}" class="btn btn-primary">Zmiana hasła</a>
+    <a href="{{ url_for('users.logout') }}" class="btn btn-primary">Wyloguj</a>
 {% endblock content %}
