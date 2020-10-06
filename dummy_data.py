@@ -110,15 +110,15 @@ def add_components():
     c3 = Component(name="Guzik", quantity=10, color=3)
     c4 = Component(name="Guzik", quantity=10, color=4)
 
-    cc1 = Component(name="Materiał", quantity=10, color=1)
-    cc2 = Component(name="Materiał", quantity=10, color=2)
-    cc3 = Component(name="Materiał", quantity=10, color=3)
-    cc4 = Component(name="Materiał", quantity=10, color=4)
+    cc1 = Component(name="Materiał", quantity=10, color=1, fabric=True)
+    cc2 = Component(name="Materiał", quantity=10, color=2, fabric=True)
+    cc3 = Component(name="Materiał", quantity=10, color=3, fabric=True)
+    cc4 = Component(name="Materiał", quantity=10, color=4, fabric=True)
 
-    ccc1 = Component(name="Nić", quantity=10, color=1)
-    ccc2 = Component(name="Nić", quantity=10, color=2)
-    ccc3 = Component(name="Nić", quantity=10, color=3)
-    ccc4 = Component(name="Nić", quantity=10, color=4)
+    ccc1 = Component(name="Nić", quantity=10, color=1, fabric=True)
+    ccc2 = Component(name="Nić", quantity=10, color=2, fabric=True)
+    ccc3 = Component(name="Nić", quantity=10, color=3, fabric=True)
+    ccc4 = Component(name="Nić", quantity=10, color=4, fabric=True)
 
     cccc1 = Component(name="Zasuwak", quantity=10, color=1)
     cccc2 = Component(name="Zasuwak", quantity=10, color=2)

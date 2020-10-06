@@ -131,10 +131,19 @@ def launch_order(id_):
                                                  component.quantity), o_components))
         result = list(map(lambda x: x[1] and (x[0], x[2]*item_q*f_multiplier) or (x[0], x[2]*item_q), components))
         order_list.extend(result)
-    for k, g in itertools.groupby(order_list, key=lambda x: x[0]):
-        final_list.append((k, sum(list(map(lambda x: x[1], g)))))
+    temp_dic = {}
+    for item in order_list:
+        if item[0] in temp_dic.keys():
+            temp_dic[item[0]] += item[1]
+        else:
+            temp_dic[item[0]] = item[1]
+
+    for k in temp_dic.keys():
+        final_list.append((k, temp_dic.get(k)))
+
     final_list = map(lambda x: (get_component_by_id(x[0]), round(get_component_by_id(x[0]).quantity-x[1], 1)),
                      final_list)
+
     if form.validate_on_submit():
         for i in final_list:
             i[0].quantity = i[1]
