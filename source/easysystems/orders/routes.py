@@ -1,3 +1,5 @@
+import itertools
+
 from flask import Blueprint, redirect, url_for, flash, render_template, request, abort
 from flask_login import current_user, login_required
 
@@ -16,7 +18,7 @@ def list_orders():
     return render_template('orders/view-orders.html', title='Zamówienia', orders=result)
 
 
-@orders.route("/add", methods=['GET', 'POST'])
+@orders.route("/order/add", methods=['GET', 'POST'])
 @login_required
 def add_order():
     form = AddOrderForm()
@@ -29,7 +31,23 @@ def add_order():
     return render_template('orders/add-order.html', title='Dodaj zamówienie', form=form)
 
 
-@orders.route("/add/<int:id_>", methods=['GET', 'POST'])
+@orders.route("/order/remove-item/<int:id_>", methods=['GET'])
+@login_required
+def remove_order_item(id_):
+    if not is_admin(current_user):
+        abort(403)
+    item = OrderItem.query.filter_by(id=id_).first_or_404()
+    order = Order.query.filter_by(id=item.order_fk).first_or_404()
+    if order.position != 1:
+        flash('Nie można usuwać przedmiotów z uruchomionych zamównień', 'danger')
+        abort(403)
+    db.session.delete(item)
+    db.session.commit()
+    flash('Pomyślnie usunięto przedmiot z zamówienia', 'success')
+    return redirect(url_for('orders.launch_order', id_=order.id))
+
+
+@orders.route("/order/add-item/<int:id_>", methods=['GET', 'POST'])
 @login_required
 def add_order_item(id_):
     if not is_admin(current_user):
@@ -58,11 +76,11 @@ def add_order_item(id_):
             db.session.add(order_item)
             db.session.commit()
             flash('Pomyślnie dodano nową pozycję w zamówieniu', 'success')
-            return redirect(url_for('orders.view_order', id_=id_))
+            return redirect(url_for('orders.launch_order', id_=id_))
     return render_template('orders/add-order-item.html', title='Dodaj pozycję do zamówienia', form=form)
 
 
-@orders.route("/remove/<int:id_>", methods=['GET'])
+@orders.route("/order/remove/<int:id_>", methods=['GET'])
 @login_required
 def remove_order(id_):
     if not is_admin(current_user):
@@ -91,10 +109,40 @@ def view_order(id_):
     return render_template('orders/view-order.html', title='Szczegóły zamówienia', order=order, form=form)
 
 
-@orders.route("/launch/<int:id_>", methods=['GET'])
+@orders.route("/order/launch/<int:id_>", methods=['GET', 'POST'])
 @login_required
 def launch_order(id_):
-    pass
+    if not is_admin(current_user):
+        abort(403)
+    order = Order.query.filter_by(id=id_).first_or_404()
+    if order.position != 1:
+        flash('Zamówienie jest już uruchomione', 'info')
+        redirect(url_for('orders.view_order', id_=id_))
+    form = LaunchForm()
+    final_list = []
+    order_list = []
+    for i in order.items:
+        item_q = i.quantity
+        f_multiplier = get_size_by_id(i.size).fabric_multiplier
+        pr = get_product_by_id(i.product)
+        o_components = pr.components
+        components = list(map(lambda component: (get_component_by_id(component.component).id,
+                                                 get_component_by_id(component.component).fabric,
+                                                 component.quantity), o_components))
+        result = list(map(lambda x: x[1] and (x[0], x[2]*item_q*f_multiplier) or (x[0], x[2]*item_q), components))
+        order_list.extend(result)
+    for k, g in itertools.groupby(order_list, key=lambda x: x[0]):
+        final_list.append((k, sum(list(map(lambda x: x[1], g)))))
+    final_list = map(lambda x: (get_component_by_id(x[0]), round(get_component_by_id(x[0]).quantity-x[1], 1)),
+                     final_list)
+    if form.validate_on_submit():
+        for i in final_list:
+            i[0].quantity = i[1]
+        order.position += 1
+        db.session.commit()
+        flash('Pomyślnie uruchomiono zamówienie ' + order.name, 'success')
+    return render_template('orders/launch-order.html', title='Uruchom zamówienie', order=order, form=form,
+                           item_list=final_list)
 
 
 @orders.route("/products/list", methods=['GET'])

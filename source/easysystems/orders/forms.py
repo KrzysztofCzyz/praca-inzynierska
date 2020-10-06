@@ -45,3 +45,8 @@ class MessageForm(FlaskForm):
     message = StringField('Wiadomość', validators=[DataRequired()])
     accept = BooleanField('Akceptuj?')
     submit = SubmitField('Gotowe')
+
+
+class LaunchForm(FlaskForm):
+
+    submit = SubmitField('Uruchom zamówienie')

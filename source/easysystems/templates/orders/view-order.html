@@ -2,15 +2,33 @@
 {% block content %}
 <main>
     <h2 class="mb-3">{{ order.name }}</h2>
-    <h4 class="mb-3">Obecna pozycja: {{ role_from_id(order.position) }}</h4>
+    <h4 class="mb-3">Obecna rola: {{ role_from_id(order.position) }}</h4>
+
     <h4>Zamówienia:</h4>
-    <ul class="list-group">
-        {% for item in order.items %}
-            <li class="list-group-item">Przedmiot: "{{ get_product_by_id(item.product).name }}", rozmiar: {{ get_size_by_id(item.size).name }}, ilość: {{ item.quantity }}</li>
-        {% endfor %}
-    </ul>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Przedmiot</th>
+                <th scope="col">Rozmiar</th>
+                <th scope="col">Ilość</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items %}
+                <tr>
+                    <th scope="row">{{ get_product_by_id(item.product).name }}</th>
+                    <td>{{ get_size_by_id(item.size).name }}</td>
+                    <td>{{ item.quantity }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     {% if current_user.role == order.position %}
-    <h2 class="mb-3">Czy zatwierdzasz to zamówienie?</h2>
+        {% if is_admin(current_user) %}
+            <a class="btn btn-info mt-3" href="{{ url_for('orders.launch_order', id_=order.id) }}">Uruchom zamówienie</a>
+        {% else %}
+                <h2 class="mb-3">Czy zatwierdzasz to zamówienie?</h2>
     <form class="form-inline">
         {{ form.hidden_tag() }}
         <div class="form-group mr-3">
@@ -41,6 +59,7 @@
         </div>
         {{ form.submit(class="btn btn-primary") }}
     </form>
+        {% endif %}
     {% endif %}
 </main>
 {% endblock content %}

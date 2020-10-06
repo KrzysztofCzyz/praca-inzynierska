@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block content %}
+{% set ns = namespace(print_form = True) %}
+<main>
+    <h2 class="mb-5">Zamówienie {{ order.name }}</h2>
+    <h4>Zamówienia:</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Przedmiot</th>
+                <th scope="col">Rozmiar</th>
+                <th scope="col">Ilość</th>
+                <th scope="col">Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items %}
+                <tr>
+                    <th scope="row">{{ get_product_by_id(item.product).name }}</th>
+                    <td>{{ get_size_by_id(item.size).name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td><a class="btn btn-danger" href="{{ url_for('orders.remove_order_item', id_=item.id) }}">Usuń z zamówienia</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a class="btn btn-outline-primary" href="{{ url_for('orders.add_order_item', id_=order.id) }}">Dodaj produkt do zamówienia</a>
+    <h4 class="mt-5">Komponenty:</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Kolor</th>
+                <th scope="col">Nazwa komponentu</th>
+                <th scope="col">Stan przed operacją</th>
+                <th scope="col">Stan po operacji</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item, quantity in item_list %}
+                <tr>
+                    <th scope="row">{{ color_from_id(item.color) }}</th>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    {% if quantity<0 %}
+                        {% set ns.print_form = False %}
+                        <td class="text-danger">{{ quantity }}</td>
+                    {% else %}
+                        <td class="text-success">{{ quantity }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if ns.print_form %}
+        <form method="post">
+            {{ form.hidden_tag() }}
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    {% else %}
+        <a class="btn btn-primary" href="{{ url_for('orders.add_components') }}">Dodaj komponenty</a>
+    {% endif %}
+</main>
+{% endblock content %}

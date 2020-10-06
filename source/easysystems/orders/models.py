@@ -64,6 +64,7 @@ class Component(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=False, nullable=False)
     color = db.Column(db.ForeignKey('color.id'), nullable=False)
+    fabric = db.Column(db.Boolean, nullable=False, default=False)
     quantity = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
