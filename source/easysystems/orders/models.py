@@ -6,7 +6,7 @@ class Order(db.Model):
     name = db.Column(db.String(120), nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
     requires_action = db.Column(db.Boolean, nullable=False, default=False)
-    position = db.Column(db.ForeignKey('role.id'), nullable=False, default=1)  # zakłada role admina
+    position = db.Column(db.ForeignKey('role.id'), nullable=False, default=1)
     message = db.Column(db.String(120), nullable=True)
 
     def __repr__(self):
@@ -36,7 +36,7 @@ class Color(db.Model):
 class Size(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
-    fabric_multiplier = db.Column(db.Integer, nullable=False)
+    fabric_multiplier = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
         return f"Size('{self.name}', '{self.id}')"
@@ -66,7 +66,7 @@ class Component(db.Model):
     name = db.Column(db.String(120), unique=False, nullable=False)
     color = db.Column(db.ForeignKey('color.id'), nullable=False)
     fabric = db.Column(db.Boolean, nullable=False, default=False)
-    quantity = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
         return f"Component('{self.name}', '{self.quantity}')"

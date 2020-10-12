@@ -1,10 +1,7 @@
-import itertools
-
-from flask import Blueprint, redirect, url_for, flash, render_template, request, abort
+from flask import Blueprint, redirect, url_for, flash, render_template, request
 from flask_login import current_user, login_required
 
 
-from source.easysystems.users.utils import is_admin
 from source.easysystems.orders.utils import *
 from source.easysystems.orders.forms import *
 
@@ -158,7 +155,7 @@ def launch_order(id_):
         final_list.append((k, temp_dic.get(k)))
 
     final_list = list(map(lambda x: (get_component_by_id(x[0]), round(get_component_by_id(x[0]).quantity-x[1], 1)),
-                     final_list))
+                          final_list))
 
     if form.validate_on_submit():
         for i in final_list:

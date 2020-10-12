@@ -13,6 +13,13 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Zaloguj')
 
 
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Hasło', validators=[DataRequired(),
+                                                  Length(6, 20, 'Hasło powinno mieć pomiędzy 6 a 20 znaków')])
+    confirm_password = PasswordField('Potwierdź hasło', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Zmień hasło')
+
+
 class RegistrationForm(FlaskForm):
     email = StringField('E-mail', validators=[DataRequired(), Email()])
     password = PasswordField('Hasło', validators=[DataRequired(),
