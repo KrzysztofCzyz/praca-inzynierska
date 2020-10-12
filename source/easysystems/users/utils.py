@@ -1,6 +1,4 @@
-from flask_mail import Message
 from source.easysystems.users.models import Role
-# from source.easysystems import mail
 
 from flask import url_for, abort
 
@@ -25,16 +23,3 @@ def get_roles():
 
     result = list(map(map_fun, roles))
     return result
-
-
-# def send_reset_message(user):
-#     token = user.get_reset_token()
-#     message = Message('Żądanie zresetowania hasła', sender='januszpawlacz122@interia.pl', recipients=[user.email])
-#     message.body = f'''Aby zmienić hasło, kliknij poniższy link:
-# {url_for('users.reset_token', token=token, _external=True)}
-#
-# Jeżeli ten mail nie był zainicjowany przez Ciebie, prosimy zignorować tę wiadomość.
-#
-# Pozdrawiamy,
-# EasySystems Team'''
-#     mail.send(message)
