@@ -18,6 +18,8 @@ def list_orders():
 @orders.route("/order/add", methods=['GET', 'POST'])
 @login_required
 def add_order():
+    if not is_admin(current_user):
+        abort(404)
     form = AddOrderForm()
     if form.validate_on_submit():
         order = Order(name=form.name.data)
