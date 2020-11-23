@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, url_for, flash, render_template, request
 from flask_login import current_user, login_required
 import json
+from math import floor
 
 from source.easysystems.orders.utils import *
 from source.easysystems.orders.forms import *
@@ -44,6 +45,31 @@ def remove_order_item(id_):
     db.session.commit()
     flash('Pomyślnie usunięto przedmiot z zamówienia', 'success')
     return redirect(url_for('orders.launch_order', id_=order.id))
+
+
+@orders.route("/order/split/<int:id_>", methods=['GET'])
+@login_required
+def split_order(id_):
+    if not is_admin(current_user):
+        abort(403)
+    order = Order.query.filter_by(id=id_).first_or_404()
+    if order.position != 1:
+        abort(404)
+    l = calculate_data_for_order(order)
+    l2 = list(filter(lambda x: x[1] < 0, l))
+    if len(l2) == 0:
+        flash('To zamówienie nie wymaga rozdziału', 'info')
+        redirect(url_for(url_for('orders.launch_order', id_=order.id)))
+    m = max(l2, key=lambda x: x[1])
+    proposal = []
+    for i in order.items:
+        size = get_size_by_id(i.size).fabric_multiplier
+        product = get_product_by_id(i.product)
+        for c in product.components:
+            if c.component == m[0].id:
+                proposal.append({"id": product.id,
+                                 "amount": c.quantity*size if get_component_by_id(c.component).fabric else c.quantity})
+    product = max(proposal, key=lambda x: x["amount"])
 
 
 @orders.route("/order/add-item/<int:id_>", methods=['GET', 'POST'])
@@ -133,30 +159,11 @@ def launch_order(id_):
         flash('Zamówienie jest już uruchomione', 'info')
         redirect(url_for('orders.view_order', id_=id_))
     form = LaunchForm()
-    final_list = []
-    order_list = []
-    for i in order.items:
-        item_q = i.quantity
-        f_multiplier = get_size_by_id(i.size).fabric_multiplier
-        pr = get_product_by_id(i.product)
-        o_components = pr.components
-        components = list(map(lambda component: (get_component_by_id(component.component).id,
-                                                 get_component_by_id(component.component).fabric,
-                                                 component.quantity), o_components))
-        result = list(map(lambda x: x[1] and (x[0], x[2]*item_q*f_multiplier) or (x[0], x[2]*item_q), components))
-        order_list.extend(result)
-    temp_dic = {}
-    for item in order_list:
-        if item[0] in temp_dic.keys():
-            temp_dic[item[0]] += item[1]
-        else:
-            temp_dic[item[0]] = item[1]
-
-    for k in temp_dic.keys():
-        final_list.append((k, temp_dic.get(k)))
-
-    final_list = list(map(lambda x: (get_component_by_id(x[0]), round(get_component_by_id(x[0]).quantity-x[1], 1)),
-                          final_list))
+    final_list = calculate_data_for_order(order)
+    missing_data = []
+    for i in final_list:
+        if i[1] < 0:
+            missing_data.append({"nazwa": i[0].name, "kolor": i[0].color, "ilosc": i[1]})
 
     if form.validate_on_submit():
         for i in final_list:
@@ -165,8 +172,9 @@ def launch_order(id_):
         db.session.commit()
         flash('Pomyślnie uruchomiono zamówienie ' + order.name, 'success')
         return redirect(url_for('orders.view_order', id_=order.id))
+
     return render_template('orders/launch-order.html', title='Uruchom zamówienie', order=order, form=form,
-                           item_list=final_list)
+                           item_list=final_list, missing_data=missing_data)
 
 
 @orders.route("/products/list", methods=['GET'])
@@ -247,24 +255,57 @@ def add_components():
             item_id = int(field.label.text.split('-')[1])+1
             for r in result:
                 if r.id == item_id:
-                    r.quantity += field.data
+                    if r.fabric:
+                        r.quantity += field.data
+                    else:
+                        r.quantity += floor(field.data)
         db.session.commit()
         flash('Komponenty dodane pomyślnie', 'success')
         return redirect(url_for('orders.list_components'))
     elif request.method == 'GET':
         for e in result:
             form.components.append_entry(data=0)
-    return render_template('orders/get-components.html', title='Dodaj komponenty', form=form, labels=labels)
+    return render_template('orders/get-components.html', title='Uzupełnij komponenty', form=form, labels=labels)
 
 
 @orders.route("/components/report", methods=['GET'])
 @login_required
-def report_components(id_):
+def report_components():
     if not is_admin(current_user):
         abort(403)
     components = Component.query.all()
-    component_report = {"components": []}
-    for c in components:
-        component_report["components"].append(c.to_json())
-    return json.dump(component_report)
+    report = get_raport(components)
+    return render_template('orders/report.html', title='Komponenty w bazie - Raport', report=report)
 
+
+@orders.route("/components/report/<int:id_>", methods=['GET', 'POST'])
+@login_required
+def report_missing_components(id_):
+    if not is_admin(current_user):
+        abort(403)
+    order = Order.query.filter_by(id=id_).first_or_404()
+    form = GetComponentsForm()
+    result = get_components()
+    r2 = calculate_data_for_order(order)
+    ids = list(map(lambda x: x[0].id, r2))
+    labels = []
+    for e in result:
+        labels.append(f"{e.id}: {color_from_id(e.color)} {e.name}, Stan po operacji: {list(filter(lambda x: x[0].id == e.id, r2))[0][1] if e.id in ids else e.quantity} Zamów:")
+    if form.validate_on_submit():
+        missing_data = []
+        result = get_components()
+        for field in form.components.entries:
+            item_id = int(field.label.text.split('-')[1]) + 1
+            print(item_id)
+            for r in result:
+                if r.id == item_id and field.data > 0:
+                    missing_data.append({"nazwa": r.name, "kolor": r.color, "ilosc": field.data})
+        report = {"components": missing_data}
+        flash('Raport utworzony pomyślnie', 'success')
+        return render_template('orders/report.html', title=order.name + ' - Raport', report=report)
+    elif request.method == 'GET':
+        for e in result:
+            val = list(filter(lambda x: x[0].id == e.id and x[1] < 0, r2) if e.id in ids else [(0, 0)])
+            form.components.append_entry(data=abs(val[0][1]) if val else 0)
+        form.submit.label.text = "Generuj"
+    return render_template('orders/get-components.html', title=order.name+" - Raport", form=form, labels=labels)

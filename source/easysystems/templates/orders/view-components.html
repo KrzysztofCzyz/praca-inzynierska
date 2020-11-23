@@ -2,6 +2,7 @@
 {% block content %}
 {% if is_admin(current_user) %}
   <a href="{{ url_for('orders.add_components') }}" class="btn btn-primary mb-3">Dodaj komponenty</a>
+  <a href="{{ url_for('orders.report_components') }}" class="btn btn-primary mb-3">Raport stanu komponentów</a>
 {% endif %}
 <h2 class="mb-3">{{ title }}</h2>
 <table class="table">

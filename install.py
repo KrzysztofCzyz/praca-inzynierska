@@ -105,40 +105,71 @@ def colors_test():
 
 
 def add_components():
-    c1 = Component(name="Guzik", quantity=10, color=1)
-    c2 = Component(name="Guzik", quantity=10, color=2)
-    c3 = Component(name="Guzik", quantity=10, color=3)
-    c4 = Component(name="Guzik", quantity=10, color=4)
+    c1 = Component(name="Guzik [szt] Typ 1", quantity=10, color=1)
+    c2 = Component(name="Guzik [szt] Typ 1", quantity=10, color=2)
+    c3 = Component(name="Guzik [szt] Typ 1", quantity=10, color=3)
+    c4 = Component(name="Guzik [szt] Typ 1", quantity=10, color=4)
 
-    cc1 = Component(name="Materiał", quantity=10, color=1, fabric=True)
-    cc2 = Component(name="Materiał", quantity=10, color=2, fabric=True)
-    cc3 = Component(name="Materiał", quantity=10, color=3, fabric=True)
-    cc4 = Component(name="Materiał", quantity=10, color=4, fabric=True)
+    xc1 = Component(name="Guzik [szt] Typ 2", quantity=10, color=1)
+    xc2 = Component(name="Guzik [szt] Typ 2", quantity=10, color=2)
+    xc3 = Component(name="Guzik [szt] Typ 2", quantity=10, color=3)
+    xc4 = Component(name="Guzik [szt] Typ 2", quantity=10, color=4)
 
-    ccc1 = Component(name="Nić", quantity=10, color=1, fabric=True)
-    ccc2 = Component(name="Nić", quantity=10, color=2, fabric=True)
-    ccc3 = Component(name="Nić", quantity=10, color=3, fabric=True)
-    ccc4 = Component(name="Nić", quantity=10, color=4, fabric=True)
+    cc1 = Component(name="Materiał [m2] Typ 1", quantity=10, color=1, fabric=True)
+    cc2 = Component(name="Materiał [m2] Typ 1", quantity=10, color=2, fabric=True)
+    cc3 = Component(name="Materiał [m2] Typ 1", quantity=10, color=3, fabric=True)
+    cc4 = Component(name="Materiał [m2] Typ 1", quantity=10, color=4, fabric=True)
 
-    cccc1 = Component(name="Zasuwak", quantity=10, color=1)
-    cccc2 = Component(name="Zasuwak", quantity=10, color=2)
-    cccc3 = Component(name="Zasuwak", quantity=10, color=3)
-    cccc4 = Component(name="Zasuwak", quantity=10, color=4)
+    xcc1 = Component(name="Materiał [m2] Typ 2", quantity=10, color=1, fabric=True)
+    xcc2 = Component(name="Materiał [m2] Typ 2", quantity=10, color=2, fabric=True)
+    xcc3 = Component(name="Materiał [m2] Typ 2", quantity=10, color=3, fabric=True)
+    xcc4 = Component(name="Materiał [m2] Typ 2", quantity=10, color=4, fabric=True)
+
+    xccc1 = Component(name="Nić [szp] Typ 1", quantity=10, color=1, fabric=True)
+    xccc2 = Component(name="Nić [szp] Typ 1", quantity=10, color=2, fabric=True)
+    xccc3 = Component(name="Nić [szp] Typ 1", quantity=10, color=3, fabric=True)
+    xccc4 = Component(name="Nić [szp] Typ 1", quantity=10, color=4, fabric=True)
+    
+    ccc1 = Component(name="Nić [szp] Typ 2", quantity=10, color=1, fabric=True)
+    ccc2 = Component(name="Nić [szp] Typ 2", quantity=10, color=2, fabric=True)
+    ccc3 = Component(name="Nić [szp] Typ 2", quantity=10, color=3, fabric=True)
+    ccc4 = Component(name="Nić [szp] Typ 2", quantity=10, color=4, fabric=True)
+
+    cccc1 = Component(name="Suwak [szt]", quantity=10, color=1)
+    cccc2 = Component(name="Suwak [szt]", quantity=10, color=2)
+    cccc3 = Component(name="Suwak [szt]", quantity=10, color=3)
+    cccc4 = Component(name="Suwak [szt]", quantity=10, color=4)
 
     db.session.add(c1)
     db.session.add(c2)
     db.session.add(c3)
     db.session.add(c4)
+    
+    db.session.add(xc1)
+    db.session.add(xc2)
+    db.session.add(xc3)
+    db.session.add(xc4)
+
 
     db.session.add(cc1)
     db.session.add(cc2)
     db.session.add(cc3)
     db.session.add(cc4)
+    
+    db.session.add(xcc1)
+    db.session.add(xcc2)
+    db.session.add(xcc3)
+    db.session.add(xcc4)
 
     db.session.add(ccc1)
     db.session.add(ccc2)
     db.session.add(ccc3)
     db.session.add(ccc4)
+    
+    db.session.add(xccc1)
+    db.session.add(xccc2)
+    db.session.add(xccc3)
+    db.session.add(xccc4)
 
     db.session.add(cccc1)
     db.session.add(cccc2)

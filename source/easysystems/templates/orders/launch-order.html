@@ -58,7 +58,8 @@
                 {{ form.submit(class="btn btn-primary") }}
             </form>
     {% else %}
-        <a class="btn btn-primary" href="{{ url_for('orders.add_components') }}">Dodaj komponenty</a>
+        <a class="btn btn-primary" href="{{ url_for('orders.add_components') }}">Uzupełnij komponenty</a>
+        <a class="btn btn-primary" href="{{ url_for('orders.report_missing_components', id_=order.id) }}">Generuj raport</a>
     {% endif %}
 </main>
 {% endblock content %}

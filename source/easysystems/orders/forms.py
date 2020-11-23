@@ -1,12 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import FieldList, IntegerField, SubmitField, StringField, SelectField, SelectMultipleField, BooleanField
+from wtforms import FieldList, IntegerField, SubmitField, StringField, SelectField, BooleanField, FloatField
 from wtforms.validators import ValidationError, DataRequired, Length
 
 from source.easysystems.orders.models import Product, Size
 
 
 class GetComponentsForm(FlaskForm):
-    components = FieldList(IntegerField())
+    components = FieldList(FloatField())
     submit = SubmitField('Dodaj komponenty')
 
 
