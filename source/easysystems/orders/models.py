@@ -70,3 +70,6 @@ class Component(db.Model):
 
     def __repr__(self):
         return f"Component('{self.name}', '{self.quantity}')"
+
+    def to_json(self):
+        return {"nazwa": self.name, "kolor": self.color, "ilosc": self.quantity}

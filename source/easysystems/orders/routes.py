@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, url_for, flash, render_template, request
 from flask_login import current_user, login_required
-
+import json
 
 from source.easysystems.orders.utils import *
 from source.easysystems.orders.forms import *
@@ -69,7 +69,6 @@ def add_order_item(id_):
         if form.product.data in order_products:
             flash('Ten produkt istnieje już w Twoim zamówieniu!', 'danger')
         else:
-            print(form.quantity.data, form.product.data, form.size.data, id_, form.size.data)
             order_item = OrderItem(quantity=form.quantity.data, product=form.product.data,
                                    order_fk=id_, size=form.size.data)
             db.session.add(order_item)
@@ -256,3 +255,16 @@ def add_components():
         for e in result:
             form.components.append_entry(data=0)
     return render_template('orders/get-components.html', title='Dodaj komponenty', form=form, labels=labels)
+
+
+@orders.route("/components/report", methods=['GET'])
+@login_required
+def report_components(id_):
+    if not is_admin(current_user):
+        abort(403)
+    components = Component.query.all()
+    component_report = {"components": []}
+    for c in components:
+        component_report["components"].append(c.to_json())
+    return json.dump(component_report)
+

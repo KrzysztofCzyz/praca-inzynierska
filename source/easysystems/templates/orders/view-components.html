@@ -8,8 +8,8 @@
   <thead>
     <tr>
       <th scope="col">Id</th>
-      <th scope="col">Kolor</th>
       <th scope="col">Nazwa komponentu</th>
+      <th scope="col">Kolor</th>
       <th scope="col">Stan</th>
     </tr>
   </thead>
@@ -17,8 +17,8 @@
   {% for item in components %}
     <tr>
       <th scope="row">{{ item.id }}</th>
-      <td>{{ color_from_id(item.color) }}</td>
       <td>{{ item.name }}</td>
+      <td>{{ color_from_id(item.color) }}</td>
       <td>{{ item.quantity }}</td>
     </tr>
   {% endfor %}
