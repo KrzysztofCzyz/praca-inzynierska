@@ -10,6 +10,11 @@ class GetComponentsForm(FlaskForm):
     submit = SubmitField('Dodaj komponenty')
 
 
+class IntegralForm(FlaskForm):
+    components = FieldList(IntegerField())
+    submit = SubmitField('Gotowe')
+
+
 class AddProductForm(FlaskForm):
     name = StringField('Nazwa produktu', validators=[DataRequired(message='Proszę wpisać nazwę produktu'),
                                                      Length(min=5,

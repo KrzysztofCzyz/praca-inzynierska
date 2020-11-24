@@ -1,6 +1,5 @@
 from flask import Blueprint, redirect, url_for, flash, render_template, request
 from flask_login import current_user, login_required
-import json
 from math import floor
 
 from source.easysystems.orders.utils import *
@@ -41,13 +40,43 @@ def remove_order_item(id_):
     if order.position != 1:
         flash('Nie można usuwać przedmiotów z uruchomionych zamównień', 'danger')
         abort(403)
-    db.session.delete(item)
-    db.session.commit()
+    remove_item_from_order(item)
     flash('Pomyślnie usunięto przedmiot z zamówienia', 'success')
     return redirect(url_for('orders.launch_order', id_=order.id))
 
 
-@orders.route("/order/split/<int:id_>", methods=['GET'])
+@orders.route("/order/edit/<int:id_>", methods=['GET', 'POST'])
+@login_required
+def edit_order(id_):
+    if not is_admin(current_user):
+        abort(403)
+    order = Order.query.filter_by(id=id_).first_or_404()
+    if order.position != 1:
+        abort(404)
+    form = IntegralForm()
+    labels = []
+    for e in order.items:
+        labels.append(f"{e.id}: {get_product_by_id(e.product).name}, rozmiar {get_size_by_id(e.size).name}")
+    if form.validate_on_submit():
+        i = 0
+        for field in form.components.entries:
+            item_id = int(labels[i].split(":")[0])
+            i += 1
+            item = OrderItem.query.filter_by(id=item_id).first_or_404()
+            if field.data < 1:
+                remove_item_from_order(item)
+            else:
+                item.quantity = field.data
+        db.session.commit()
+        flash('Dane zmieniono pomyślnie', 'success')
+        return redirect(url_for('orders.launch_order', id_=order.id))
+    elif request.method == 'GET':
+        for e in order.items:
+            form.components.append_entry(data=e.quantity)
+    return render_template('orders/edit-order.html', title='Edytuj pozycje zamówienia', form=form, items=order.items, labels=labels)
+
+
+@orders.route("/order/split/<int:id_>", methods=['GET', 'POST'])
 @login_required
 def split_order(id_):
     if not is_admin(current_user):
@@ -55,21 +84,40 @@ def split_order(id_):
     order = Order.query.filter_by(id=id_).first_or_404()
     if order.position != 1:
         abort(404)
-    l = calculate_data_for_order(order)
-    l2 = list(filter(lambda x: x[1] < 0, l))
-    if len(l2) == 0:
-        flash('To zamówienie nie wymaga rozdziału', 'info')
-        redirect(url_for(url_for('orders.launch_order', id_=order.id)))
-    m = max(l2, key=lambda x: x[1])
-    proposal = []
-    for i in order.items:
-        size = get_size_by_id(i.size).fabric_multiplier
-        product = get_product_by_id(i.product)
-        for c in product.components:
-            if c.component == m[0].id:
-                proposal.append({"id": product.id,
-                                 "amount": c.quantity*size if get_component_by_id(c.component).fabric else c.quantity})
-    product = max(proposal, key=lambda x: x["amount"])
+    form = IntegralForm()
+    labels = []
+    for e in order.items:
+        labels.append(f"{e.id}: {get_product_by_id(e.product).name}, rozmiar {get_size_by_id(e.size).name}, obecna ilość {e.quantity}")
+    if form.validate_on_submit():
+        i = 0
+        order2 = Order(name=order.name+' - część 2')
+        new_items = False
+        for field in form.components.entries:
+            item_id = int(labels[i].split(":")[0])
+            i += 1
+            item = OrderItem.query.filter_by(id=item_id).first_or_404()
+            if field.data < 1:
+                new_item = OrderItem(quantity=item.quantity, product=item.product, order=order2, size=item.size)
+                db.session.delete(item)
+                db.session.add(new_item)
+                new_items = True
+            elif field.data < item.quantity:
+                diff = item.quantity - field.data
+                new_item = OrderItem(quantity=diff, product=item.product, order=order2, size=item.size)
+                item.quantity -= field.data
+                db.session.add(new_item)
+                new_items = True
+        if new_items:
+            db.session.add(order2)
+            db.session.commit()
+            flash('Pomyślnie rozdzielono zamówienia', 'success')
+        else:
+            flash('Brak produktów do rodzielenia', 'info')
+        return redirect(url_for('orders.list_orders'))
+    elif request.method == 'GET':
+        for e in order.items:
+            form.components.append_entry(data=e.quantity)
+    return render_template('orders/split-order.html', title='Podziel zamówienie', form=form, items=order.items, labels=labels)
 
 
 @orders.route("/order/add-item/<int:id_>", methods=['GET', 'POST'])
@@ -95,10 +143,7 @@ def add_order_item(id_):
         if form.product.data in order_products:
             flash('Ten produkt istnieje już w Twoim zamówieniu!', 'danger')
         else:
-            order_item = OrderItem(quantity=form.quantity.data, product=form.product.data,
-                                   order_fk=id_, size=form.size.data)
-            db.session.add(order_item)
-            db.session.commit()
+            add_item_to_order(form.quantity.data, form.product.data, id_, form.size.data)
             flash('Pomyślnie dodano nową pozycję w zamówieniu', 'success')
             return redirect(url_for('orders.launch_order', id_=id_))
     return render_template('orders/add-order-item.html', title='Dodaj pozycję do zamówienia', form=form)

@@ -112,3 +112,18 @@ def calculate_data_for_order(order):
 
     return list(map(lambda x: (get_component_by_id(x[0]),
                                round(get_component_by_id(x[0]).quantity - x[1], 1)), final_list))
+
+
+def remove_item_from_order(item):
+    db.session.delete(item)
+    db.session.commit()
+    return {"quantity": item.quantity, "product": item.product, "order_fk": item.order_fk, "size": item.size}
+
+
+def add_item_to_order(quantity, product, order_fk, size):
+    order_item = OrderItem(quantity=quantity, product=product,
+                           order_fk=order_fk, size=size)
+    db.session.add(order_item)
+    db.session.commit()
+
+

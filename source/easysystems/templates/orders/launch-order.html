@@ -4,6 +4,8 @@
 <main>
     <h2 class="mb-3">Zamówienie {{ order.name }}</h2>
     <a class="btn btn-danger mb-4" href="{{ url_for('orders.remove_order', id_=order.id) }}">Usuń zamówienie</a>
+    <a class="btn btn-info mb-4" href="{{ url_for('orders.edit_order', id_=order.id) }}">Edytuj zamówienie</a>
+    <a class="btn btn-danger mb-4" href="{{ url_for('orders.split_order', id_=order.id) }}">Podziel zamówienie</a>
     <h4>Zamówienia:</h4>
     <table class="table">
         <thead>
