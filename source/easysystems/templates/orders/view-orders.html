@@ -11,6 +11,7 @@
             <th scope="col">Akcja</th>
             {% if is_admin(current_user) %}
             <th scope="col">Wiadomość</th>
+            <th scope="col">Pozycja</th>
             {% endif %}
         </tr>
     </thead>
@@ -28,6 +29,13 @@
                     <a class="btn btn-success" href="{{ url_for('orders.perform_action', id_=order.id) }}">Przywróć</a>
                     </td>
                     <td class="text-danger"> {{ order.message }}
+                {% else %}
+                        <td></td>
+                        {% if order.completed %}
+                        <td class="text-success"> Zakończony </td>
+                        {% else %}
+                        <td class="text-info"> W trakcie </td>
+                        {% endif %}
                 {% endif %}
             </td>
         </tr>

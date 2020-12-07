@@ -34,7 +34,8 @@ def get_products():
 
 
 def get_orders_for_user(user):
-    order_list = Order.query.except_(Order.query.filter_by(completed=True))
+    # order_list = Order.query.except_(Order.query.filter_by(completed=True))
+    order_list = Order.query
     if not is_admin(user):
         return order_list.filter_by(position=user.role).filter_by(requires_action=False).all()
     else:

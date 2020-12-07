@@ -72,4 +72,4 @@ class Component(db.Model):
         return f"Component('{self.name}', '{self.quantity}')"
 
     def to_json(self):
-        return {"nazwa": self.name, "kolor": self.color, "ilosc": self.quantity}
+        return {"nazwa": self.name, "kolor": self.color, "ilosc": str(self.quantity)}

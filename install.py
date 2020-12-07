@@ -39,12 +39,14 @@ def add_roles():
     r3 = Role(name="Szycie")
     r4 = Role(name="Kontrola Jakości")
     r5 = Role(name="Pakowanie")
+    r6 = Role(name="Wysyłka")
 
     db.session.add(r1)
     db.session.add(r2)
     db.session.add(r3)
     db.session.add(r4)
     db.session.add(r5)
+    db.session.add(r6)
 
     db.session.commit()
 

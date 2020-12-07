@@ -320,7 +320,7 @@ def report_components():
         abort(403)
     components = Component.query.all()
     report = get_raport(components)
-    return render_template('orders/report.html', title='Komponenty w bazie - Raport', report=report)
+    return render_template('orders/report.html', title='Komponenty w bazie - Raport', report=report["components"])
 
 
 @orders.route("/components/report/<int:id_>", methods=['GET', 'POST'])
@@ -341,7 +341,6 @@ def report_missing_components(id_):
         result = get_components()
         for field in form.components.entries:
             item_id = int(field.label.text.split('-')[1]) + 1
-            print(item_id)
             for r in result:
                 if r.id == item_id and field.data > 0:
                     missing_data.append({"nazwa": r.name, "kolor": r.color, "ilosc": field.data})
