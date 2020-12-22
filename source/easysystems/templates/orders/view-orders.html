@@ -30,11 +30,13 @@
                     </td>
                     <td class="text-danger"> {{ order.message }}
                 {% else %}
+                        {% if is_admin(current_user) %}
                         <td></td>
                         {% if order.completed %}
                         <td class="text-success"> Zakończony </td>
                         {% else %}
-                        <td class="text-info"> W trakcie </td>
+                        <td class="text-info"> {{ role_from_id(order.position) }} </td>
+                        {% endif %}
                         {% endif %}
                 {% endif %}
             </td>

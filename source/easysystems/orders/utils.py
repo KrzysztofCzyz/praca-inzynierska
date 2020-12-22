@@ -64,7 +64,7 @@ def get_component_by_id(id_):
 
 
 def advance_order(order):
-    if role_from_id(order.position) == 'Pakowanie':
+    if role_from_id(order.position) == 'Wysyłka':
         order.completed = True
         db.session.commit()
         return
